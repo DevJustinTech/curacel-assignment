@@ -105,10 +105,15 @@ Implements specialized extractors for:
    ```bash
    # Windows (download installer):
    https://github.com/UB-Mannheim/tesseract/wiki
-   
-   # Add to System PATH:
-   C:\Program Files\Tesseract-OCR\
+
+   # macOS (Homebrew):
+   brew install tesseract
+
+   # Linux (Debian/Ubuntu):
+   sudo apt-get install tesseract-ocr
    ```
+   - On Windows, ensure `C:\Program Files\Tesseract-OCR\` is on your PATH.
+   - On macOS/Linux, confirm `tesseract` is available via `which tesseract`.
 
 ### Installation
 
@@ -130,8 +135,8 @@ Implements specialized extractors for:
    ```
 
 4. Verify the Tesseract executable path:
-   - The application defaults to `C:\Program Files\Tesseract-OCR\tesseract.exe`.
-   - If Tesseract is installed elsewhere, adjust the path in `assignment.py` before running the service.
+   - Windows default: `C:\Program Files\Tesseract-OCR\tesseract.exe` (update `assignment.py` if different).
+   - macOS/Linux: check `which tesseract` for the installed binary location.
 
 ### Running the Service
 
