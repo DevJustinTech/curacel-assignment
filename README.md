@@ -36,6 +36,8 @@ Implements specialized extractors for:
 - `POST /ask`: Query extracted information (with 2s delay)
 - `GET /health`: Service health monitoring
 
+
+
 ## Implementation Decisions & Assumptions
 
 ### Name Extraction
@@ -61,6 +63,39 @@ Implements specialized extractors for:
 - Removes numeric-only entries
 - Requires medical context keywords
 - Deduplicates while preserving order
+
+### Assumptions and Decisions Made During Implementation
+
+#### General
+- Input documents are medical insurance claim sheets or similar forms containing patient, diagnosis, and billing details.
+- OCR text accuracy depends on image clarity, lighting, and font quality.
+- Only English-language documents are supported.
+- Each uploaded file is assumed to represent one claim document (not multiple claims).
+
+#### Design & Architecture
+- FastAPI was chosen for its performance, readability, and async capabilities.
+- The system is designed as a lightweight, local microservice, with no external API calls.
+- Tesseract OCR handles text recognition offline.
+- pdf2image converts PDFs into images to support OCR on all pages.
+- The `/ask` endpoint simulates a Q&A engine by searching extracted text contextually and includes a 2-second delay for realism.
+
+#### Data Extraction Logic
+- Names are extracted using clear context cues like “Patient Name” or “Member Name”.
+- Ages and birthdates use numeric and date pattern recognition.
+- Diagnoses, medications, and procedures are extracted using rule-based matching and keyword filtering.
+- Admission and discharge dates are parsed from recognized date formats.
+- Total amounts are detected using ₦ or NGN prefixes and normalized to ₦ format.
+- Extraction logic prioritizes labeled fields; in ambiguous cases, nearest contextual matches are chosen.
+
+#### Error Handling & Validation
+- OCR or PDF processing errors return descriptive 400-level errors.
+- Invalid or empty uploads are rejected gracefully.
+- Structured validation ensures extracted values fit expected types and formats.
+
+#### Performance & Scalability
+- The service processes documents synchronously, ideal for testing or low-volume environments.
+- Data is stored in-memory, cleared after each request.
+- Future scalability options include async task queues and persistent storage.
 
 ## Setup Instructions
 
@@ -113,12 +148,7 @@ Implements specialized extractors for:
      - POST http://localhost:8000/ask
      - GET http://localhost:8000/health
 
-## Testing
 
-Use the included test script to verify functionality:
-```bash
-python test_api.py
-```
 
 ### Sample Request
 ```bash
