@@ -129,10 +129,9 @@ Implements specialized extractors for:
    pip install -r requirements.txt
    ```
 
-4. Create .env file:
-   ```plaintext
-   TESSERACT_PATH=C:\Program Files\Tesseract-OCR\tesseract.exe
-   ```
+4. Verify the Tesseract executable path:
+   - The application defaults to `C:\Program Files\Tesseract-OCR\tesseract.exe`.
+   - If Tesseract is installed elsewhere, adjust the path in `assignment.py` before running the service.
 
 ### Running the Service
 
