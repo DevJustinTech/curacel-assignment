@@ -1,0 +1,174 @@
+# Curacel Claims QA Service
+
+A FastAPI microservice for processing medical insurance claim documents using OCR, with structured data extraction and Q&A capabilities.
+
+## Overview
+
+This service processes scanned/photographed insurance claim documents to verify treatments, medications, and other provided services. It extracts structured data and provides a Q&A interface for querying the extracted information.
+
+### Key Features
+- Document processing (PDF and images)
+- Structured data extraction
+- Medical claim information parsing
+- Q&A capability
+- Health monitoring
+
+## Technical Approach
+
+### 1. Document Processing Pipeline
+- Uses Tesseract OCR for text extraction
+- PDF support via pdf2image for multi-page documents
+- Robust error handling and validation
+- Supports both image (PNG, JPEG) and PDF formats
+
+### 2. Data Extraction
+Implements specialized extractors for:
+- Patient & Member Names (context-aware, two-word format)
+- Ages (with DOB fallback)
+- Medications (name, dosage, quantity)
+- Procedures (filtered for medical relevance)
+- Diagnoses (keyword-based)
+- Admission Details (with date parsing)
+- Total Amounts (with currency normalization)
+
+### 3. API Endpoints
+- `POST /extract`: Process documents and extract structured data
+- `POST /ask`: Query extracted information (with 2s delay)
+- `GET /health`: Service health monitoring
+
+## Implementation Decisions & Assumptions
+
+### Name Extraction
+- Patient and member names are treated as separate entities
+- Names are normalized to exactly two words (first and last name)
+- Context-aware extraction to avoid mixing with facility names
+- Explicit label matching (e.g., "patient name:", "member name:")
+
+### Medication Processing
+- Strips product codes
+- Parses dosage patterns (e.g., "100mg", "500 ml")
+- Identifies quantities and units
+- Normalizes formatting
+
+### Amount Detection
+- Supports both ₦ and NGN formats
+- Normalizes to ₦ format
+- Prioritizes labeled amounts
+- Falls back to largest amount heuristic
+
+### Procedures
+- Filters out form labels (ending with colon)
+- Removes numeric-only entries
+- Requires medical context keywords
+- Deduplicates while preserving order
+
+## Setup Instructions
+
+### Prerequisites
+1. Python 3.8+
+2. Tesseract OCR installed on your system
+   ```bash
+   # Windows (download installer):
+   https://github.com/UB-Mannheim/tesseract/wiki
+   
+   # Add to System PATH:
+   C:\Program Files\Tesseract-OCR\
+   ```
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd curacel-assignment
+   ```
+
+2. Create and activate virtual environment:
+   ```bash
+   python -m venv venv
+   .\venv\Scripts\activate  # Windows
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Create .env file:
+   ```plaintext
+   TESSERACT_PATH=C:\Program Files\Tesseract-OCR\tesseract.exe
+   ```
+
+### Running the Service
+
+1. Start the server:
+   ```bash
+   uvicorn assignment:app --reload --port 8000
+   ```
+
+2. Access the API:
+   - Swagger UI: http://localhost:8000/docs
+   - API endpoints:
+     - POST http://localhost:8000/extract
+     - POST http://localhost:8000/ask
+     - GET http://localhost:8000/health
+
+## Testing
+
+Use the included test script to verify functionality:
+```bash
+python test_api.py
+```
+
+### Sample Request
+```bash
+curl -X POST http://localhost:8000/extract \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@sample.pdf"
+```
+
+## Dependencies
+
+```plaintext
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+pillow==10.1.0
+pytesseract==0.3.10
+pdf2image==1.16.3
+python-dotenv==1.0.0
+pydantic==2.4.2
+```
+
+## Error Handling
+
+The service includes comprehensive error handling for:
+- Invalid file formats
+- OCR processing failures
+- Data extraction errors
+- Document not found scenarios
+- Invalid request formats
+
+## Limitations & Future Improvements
+
+1. OCR Accuracy
+   - Could be improved with image preprocessing
+   - Multiple OCR engine support
+
+2. Data Extraction
+   - More comprehensive medical terminology
+   - Better handling of varied document formats
+   - Machine learning-based extraction
+
+3. Performance
+   - Caching for frequent queries
+   - Batch processing support
+   - Async processing for large documents
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
