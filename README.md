@@ -101,7 +101,8 @@ Implements specialized extractors for:
 
 ### Prerequisites
 1. Python 3.8+
-2. Tesseract OCR installed on your system
+2. Tesseract OCR installed on your system. Tesseract needs poppler to run, install poppler on your machine if uou don't have it installed.
+3. Add both to path
    ```bash
    # Windows (download installer):
    https://github.com/UB-Mannheim/tesseract/wiki
